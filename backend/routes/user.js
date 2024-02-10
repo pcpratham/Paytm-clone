@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const zod = require("zod");
 const authMiddleware = require("../middleware");
-
+const Account = require("../models/Account");
 
 const signupBody = zod.object({
     username: zod.string().email(),
@@ -45,7 +45,11 @@ userRouter.post("/signup",async(req,res)=>{
     });
     
     const userID = user._id;
-
+    const bal = Math.floor(Math.random() * (10000)) + 1;
+    const accountDetails = await Account.create({
+        userId:userID,
+        balance:bal
+    });
     const token = jwt.sign({
         userID
     },process.env.JWT_SECRET);
