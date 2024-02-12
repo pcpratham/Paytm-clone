@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom"
 import axios from "axios";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 export const SendMoney = () => {
     const [searchParams] = useSearchParams();
@@ -41,15 +44,42 @@ export const SendMoney = () => {
                             />
                         </div>
                         <button
-                            onClick={() => {
-                                axios.post("http://localhost:4000/api/v1/account/transfer", {
-                                    to: id,
-                                    amount:amount
-                                }, {
-                                    headers: {
-                                        authorization: "Bearer " + localStorage.getItem('token')
-                                    }
-                                })
+                            onClick={async () => {
+                                const response = await fetch(`${import.meta.env.VITE_SOME_KEY}` +"/api/v1/account/transfer",{
+                                    method : "POST",
+                                    headers:{
+                                        'authorization': "Bearer " + localStorage.getItem('token'),
+                                        'Content-Type' : "application/json"
+                                    },
+                                    body : JSON.stringify({
+                                        to : id,
+                                        amount : amount
+                                    })
+
+                                });
+                                const data = await response.json();
+                                if (data.ok) {
+                                    toast.success("Payment Successfull!!");
+                                }
+                                else{
+                                    toast.error(data.msg)
+                                }
+                                // const response = await axios.post("http://localhost:4000/api/v1/account/transfer", {
+                                //     to: id,
+                                //     amount: amount
+                                // }, {
+                                //     headers: {
+                                //         authorization: "Bearer " + localStorage.getItem('token')
+                                //     }
+                                // });
+                                // console.log("response ",response.data);
+                                // if (response.data.ok) {
+                                //     toast.success("Payment Successfull!!");
+                                // }
+                                // else{
+                                //     console.log("failed ",response.data);
+                                //     // toast.error(response.data.msg)
+                                // }
                             }
                             }
                             className="justify-center rounded-md text-sm font-medium ring-offset-background transition-colors h-10 px-4 py-2 w-full bg-green-500 text-white">

@@ -6,6 +6,7 @@ import { Button } from '../components/Button'
 import { BottomWarning } from '../components/BottomWarning'
 import axios from "axios"
 import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
 
 const Signup = () => {
   const [firstName, setFirstName] = useState("");
@@ -30,14 +31,21 @@ const Signup = () => {
           <InputBoxComponent onChange={e => setPassword(e.target.value)} label="Password" placeholder="*********" />
           <div className="pt-4 ">
             <Button onClick={async () => {
-              const response  = await axios.post("http://localhost:4000/api/v1/user/signup", {
+              const response  = await axios.post(`${import.meta.env.VITE_SOME_KEY}` +"/api/v1/user/signup", {
                 username,
                 firstName,
                 lastName,
                 password
               });
                localStorage.setItem("token",response.data.token);
-               navigate("/dashboard")
+               if(response.data.ok){
+                toast.success("Sign up Done!!")
+                navigate("/signin")
+               }
+               else{
+                toast.error(response.data.message);
+               }
+               
             }} label={"Sign up"} />
           </div>
           <BottomWarning label="Already have an account?" buttonText={"Sign in"} to={"/signin"} />

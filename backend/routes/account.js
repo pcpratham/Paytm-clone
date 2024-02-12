@@ -8,7 +8,7 @@ accountRouter.get("/balance",authMiddleware,async(req,res)=>{
     const userId = req.userId;
     const accountDetails = await  Account.findOne({userId:userId});
     return res.status(200).json({
-        balance : accountDetails.balance
+        balance : accountDetails?.balance
     });
 })
 
@@ -26,6 +26,7 @@ accountRouter.post("/transfer",authMiddleware,async(req,res)=>{
     if(!account  || account.balance < amount){
         await session.abortTransaction();
         return res.status(400).json({
+            ok : false,
             msg : "Insufficient Balance"
         });
     }
@@ -34,6 +35,7 @@ accountRouter.post("/transfer",authMiddleware,async(req,res)=>{
     if(!toAccount){
         await session.abortTransaction();
         return res.status(400).json({
+            ok : false,
             msg : "Account Info doesn't matches"
         });
     }
@@ -52,9 +54,12 @@ accountRouter.post("/transfer",authMiddleware,async(req,res)=>{
 
     await session.commitTransaction();
     return res.status(200).json({
+        ok : true,
         msg : "Transfer Successful"
     });
 })
+
+
 
 
 module.exports = accountRouter;

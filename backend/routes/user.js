@@ -23,6 +23,7 @@ userRouter.post("/signup",async(req,res)=>{
     
     if(!success){
         return res.status(411).json({
+            ok : false,
             message:"Email already taken/Incorrect Inputs"
         })
     }
@@ -33,6 +34,7 @@ userRouter.post("/signup",async(req,res)=>{
 
     if (existingUser) {
         return res.status(411).json({
+            ok : false,
             message: "Email already taken/Incorrect inputs"
         })
     }
@@ -55,6 +57,7 @@ userRouter.post("/signup",async(req,res)=>{
     },process.env.JWT_SECRET);
 
     return res.status(200).json({
+        ok : true,
         message:"User created successfully",
         token:token
     });
@@ -65,6 +68,7 @@ userRouter.post("/signin",async(req,res)=>{
    const {success} = signinBody.safeParse(req.body);
    if(!success){
         return res.status(411).json({
+            ok : false,
             message:"Error while logging in",  
         });
     }
@@ -76,6 +80,7 @@ userRouter.post("/signin",async(req,res)=>{
 
     if(!user){
         return res.status(411).json({
+            ok : false,
             message:"Error while logging in",  
         });
     }
@@ -85,6 +90,7 @@ userRouter.post("/signin",async(req,res)=>{
     }, process.env.JWT_SECRET);
 
     return res.status(200).json({
+        ok :true,
         token: token
     })
 
@@ -148,5 +154,26 @@ userRouter.get("/bulk",async(req,res)=>{
     })
 })
 
+
+userRouter.get("/self",authMiddleware,async(req,res)=>{
+    const userId = req.userId;
+    const user = await User.findById({_id:userId});
+    if(!user){
+        return res.status(411).json({
+            ok:false,
+            message : "User not exits"
+        });
+    }
+    const userObj = {
+        firstName : user.firstName,
+        lastName : user.lastName
+    }
+    return res.status(200).json({
+        ok:true,
+        data : userObj
+    });
+
+    
+})
 
 module.exports = userRouter;
